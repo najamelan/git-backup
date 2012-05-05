@@ -24,5 +24,6 @@
 Dir::chdir( "#{ARGV[1]}" )
 
 `git config core.bare false`
+`git config core.logallrefupdates true`
 `git remote rm origin`
 `git checkout`
