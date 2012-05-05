@@ -29,9 +29,9 @@ The .git/config file in each repository is used to store the
 configuration for that repository, and $HOME/.gitconfig is used to store a per-user configuration as fallback values for the .git/config file. The file /etc/gitconfig
 can be used to store a system-wide default configuration.
 
-	backup.directory   = string  -- the directory for the backup bundles                                   -- default = the directory where your repo is located<br />
-	backup.prefix-date = boolean -- will prepend the filename with a date in the format: "YYYY-MM-DD - "   -- default = true<br />
-	backup.prefix-time = boolean -- will propend the filename with a time in the format: "HH:MM:SS - "     -- default = false<br />
+	backup.directory   = string  -- the directory for the backup bundles                                   -- default = the directory where your repo is located
+	backup.prefix-date = boolean -- will prepend the filename with a date in the format: "YYYY-MM-DD - "   -- default = true
+	backup.prefix-time = boolean -- will propend the filename with a time in the format: "HH:MM:SS - "     -- default = false
 
 
 ## OPTIONS
