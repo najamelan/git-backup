@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+#
+#
+# restores a git repository earlier backed up with git-backup
+# documentation in man git-restore(1)
+#
+# ideal scenario: git restore my-repo
+#
+# looks in git config for the default backup location
+# search for the files corresponding to the repo name
+# get the most recent
+#
+# In the future there will be probably 3 scripts, one for backup, one for restore and one with common functionality such as querying git config
+#
+# Right now, just take to command line parameters
+#
+# TODO:
+# -everything ;)
+#
+
+
+`git clone --mirror "#{ARGV[0]}" "#{ARGV[1]}/.git"`
+
+Dir::chdir( "#{ARGV[1]}" )
+
+`git config core.bare false`
+`git remote rm origin`
+`git checkout`

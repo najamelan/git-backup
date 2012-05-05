@@ -1,0 +1,39 @@
+.\" Manpage for git-restore.
+
+
+.TH man 1 "06 May 2012" "Git-restore v0.1" "GIT-restore"
+
+
+.SH NAME
+git-restore \- recovers git repositories from backup files made by git-backup
+
+
+.SH SYNOPSIS
+git restore BUNDLENAME LOCATION
+
+
+.SH DESCRIPTION
+Will run git-clone --mirror to make a repository out of the given bundle and will then remove the remote, and turn the bare repo into a working tree. Currently this is a very crude script without any errorhandling whatsoever. Use at your own risk.
+
+.SH INSTALLATION
+Copy this script to a directory in your path. Make sure it has executable permissions. Copy this man page to "/usr/local/man".
+
+
+.SH OPTIONS
+Git-restore does not take any options. However, you should supply a bundlename and a location for the new repo.
+
+
+.SH SEE ALSO
+git-backup(1), git(1), git-clone(1), git-pull(1)
+
+https://github.com/najamelan/git-backup
+
+
+.SH BUGS
+Should be fixed instead of listed here
+
+Please create bug reports in the issue tracker of github or better do a pull request.
+
+
+.SH AUTHOR
+Naja Melan najamelan@autistici.org
