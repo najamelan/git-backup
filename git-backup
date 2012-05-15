@@ -127,11 +127,11 @@ bundle_name = ARGV[0] if( ARGV[0] )
 bundle_name = directory + prefix + bundle_name + filename_suffix
 
 
-puts "Backing up to bundle \"#{bundle_name}\""
+puts "Backing up to bundle #{bundle_name.inspect}"
 
 
 # git bundle will print it's own error messages if it fails
-`git bundle create "#{bundle_name}" --all --remotes`
+`git bundle create #{bundle_name.inspect} --all --remotes`
 
 
 end # def git_backup
