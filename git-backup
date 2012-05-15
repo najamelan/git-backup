@@ -100,7 +100,7 @@ end
 
 
 # verify directory exists
-#
+
 unless File::directory?( directory )
 
 	raise( 'fatal: backup directory does not exists: ' + directory )
