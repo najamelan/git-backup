@@ -3,12 +3,11 @@
 # For documentation please sea man git-backup(1)
 #
 # TODO:
+# - make it a class rather than a function
 # - check the standard format of git warnings to be conform
 # - do better checking for git repo than calling git status
 # - if multiple entries found in config file, specify which file
 # - make it work with submodules
-# - manpage
-# - automatic installer or inclusion in git
 # - propose to make backup directory if it does not exists
 # - depth feature in git config (eg. only keep 3 backups for a repo - like rotate...)
 # - TESTING
