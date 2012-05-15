@@ -96,13 +96,6 @@ unless File::directory?( directory )
 end
 
 
-unless directory =~ /\/$/
-
-	directory += '/'
-
-end
-
-
 # The date and time prefix
 # ------------------------
 
@@ -124,7 +117,7 @@ bundle_name = Dir.pwd.split('/').last
 bundle_name = ARGV[0] if( ARGV[0] )
 
 
-bundle_name = directory + prefix + bundle_name + filename_suffix
+bundle_name = File::join( directory, prefix + bundle_name + filename_suffix )
 
 
 puts "Backing up to bundle #{bundle_name.inspect}"
