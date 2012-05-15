@@ -34,7 +34,6 @@ end
 
 
 # Test if we are inside a git repo
-
 `git status 2>&1`
 
 if $?.exitstatus != 0
@@ -81,12 +80,10 @@ directory = `git config --get backup.directory`
 
 
 # git config adds a newline, so remove it
-
 directory.chomp!
 
 
 # check exit status of git config
-
 case $?.exitstatus
 
 	when 1 :	directory = Dir.pwd[ /(.+)\/[^\/]+/, 1]
@@ -101,7 +98,6 @@ end
 
 
 # verify directory exists
-
 unless File::directory?( directory )
 
 	raise( 'fatal: backup directory does not exists: ' + directory )
@@ -127,12 +123,10 @@ add_time_default = false
 
 
 # get the setting for the prefix-date from git config
-
 add_date = `git config --get backup.prefix-date`
 
 
 # check exit status of git config
-
 case $?.exitstatus
 
 	# when not set
@@ -151,12 +145,10 @@ end
 
 
 # get the setting for the prefix-time from git config
-
 add_time = `git config --get backup.prefix-time`
 
 
 # check exit status of git config
-
 case $?.exitstatus
 
 	# when not set
