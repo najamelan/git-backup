@@ -112,49 +112,8 @@ prefix_time      = Time.now.strftime( '%H:%M:%S' ) + ' - '
 add_date_default = true
 add_time_default = false
 
-
-# get the setting for the prefix-date from git config
-add_date = `git config --get backup.prefix-date`
-
-
-# check exit status of git config
-case $?.exitstatus
-
-	# when not set
-	when 1 : prefix += prefix_date if add_date_default
-
-	when 0 : prefix += prefix_date unless add_date =~ /(false|no|0)/i
-
-	when 2 : prefix += prefix_date unless add_date =~ /(false|no|0)/i
-				puts 'Warning: Multiple entries of backup.prefix-date found in your git config file. Will use the last one: ' + add_date
-
-	else     raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus )
-
-end
-
-
-
-
-# get the setting for the prefix-time from git config
-add_time = `git config --get backup.prefix-time`
-
-
-# check exit status of git config
-case $?.exitstatus
-
-	# when not set
-	when 1 : prefix += prefix_time if add_time_default
-
-	when 0 : prefix += prefix_time unless add_time =~ /(false|no|0)/i
-
-	when 2 : prefix += prefix_time unless add_time =~ /(false|no|0)/i
-				puts 'Warning: Multiple entries of backup.prefix-time found in your git config file. Will use the last one: ' + add_time
-
-	else     raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus )
-
-end
-
-
+prefix += prefix_date if git_config_bool( 'backup.prefix-date', add_date_default )
+prefix += prefix_time if git_config_bool( 'backup.prefix-time', add_time_default )
 
 
 
@@ -177,6 +136,30 @@ puts "Backing up to bundle \"#{bundle_name}\""
 
 
 end # def git_backup
+
+
+
+# helper function to call git config to retrieve a boolean setting
+def git_config_bool( option, default_value )
+
+	# get the setting for the prefix-time from git config
+	config_value = `git config --get #{option.inspect}`
+
+	# check exit status of git config
+	case $?.exitstatus
+
+		# when not set take default
+		when 1 : return default_value
+
+		when 0 : return true unless config_value =~ /(false|no|0)/i
+
+		when 2 : puts 'Warning: Multiple entries of #{option.inspect} found in your git config file. Will use the last one: ' + config_value
+		 			return true unless config_value =~ /(false|no|0)/i
+
+		else     raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus )
+
+	end
+end
 
 # function needs to be called if we are not included in another script
 git_backup if __FILE__ == $0
