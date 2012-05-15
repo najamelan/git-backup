@@ -15,22 +15,13 @@
 
 
 
+# allow calling from other scripts
+def git_backup
 
 
 # constants:
 git_dir_name    = '.git'          # just to avoid magic "strings"
 filename_suffix = ".git.bundle"   # will be added to the filename of the created backup
-
-
-
-# The original script refused to run unless it was called directly. I don't know why. Personally I would remove this
-if __FILE__ != $0
-
-	puts 'fatal: script not called directly. Currently not supported'
-	exit 1
-
-end
-
 
 
 # Test if we are inside a git repo
@@ -183,4 +174,10 @@ puts "Backing up to bundle \"#{bundle_name}\""
 
 # git bundle will print it's own error messages if it fails
 `git bundle create "#{bundle_name}" --all --remotes`
+
+
+end # def git_backup
+
+# function needs to be called if we are not included in another script
+git_backup if __FILE__ == $0
 
