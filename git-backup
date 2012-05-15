@@ -95,7 +95,7 @@ case $?.exitstatus
 
 	when 2 :	puts 'Warning: Multiple entries of backup.directory found in your git config file. Will use the last one: ' + directory
 
-	else     unless $?.exitstatus == 0 : raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus ) end
+	else     unless $?.exitstatus == 0 then raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus ) end
 
 end
 
