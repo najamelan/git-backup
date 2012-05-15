@@ -118,8 +118,7 @@ prefix += prefix_time if git_config_bool( 'backup.prefix-time', add_time_default
 
 
 # default bundle name is the name of the repo
-# do we really need .chomp?
-bundle_name = Dir.pwd.split('/').last.chomp
+bundle_name = Dir.pwd.split('/').last
 
 # set the name of the file to the first command line argument if given
 bundle_name = ARGV[0] if( ARGV[0] )
