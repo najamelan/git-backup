@@ -18,7 +18,8 @@
 
 # globals:
 
-git_dir_name = '.git' # just to avoid magic "strings"
+GIT_DIR_NAME    = '.git'          # just to avoid magic "strings"
+FILENAME_SUFFIX = ".git.bundle"   # will be added to the filename of the created backup
 
 
 
@@ -44,7 +45,7 @@ if $?.exitstatus != 0
 
 else # git status success
 
-	until    	 File::directory?( Dir.pwd + '/' + git_dir_name )             \
+	until    	 File::directory?( Dir.pwd + '/' + GIT_DIR_NAME )             \
 				or  File::directory?( Dir.pwd                      ) == '/'
 
 
@@ -172,10 +173,6 @@ end
 
 
 
-# Suffix
-
-suffix = ".git.bundle"
-
 
 
 # default bundle name is the name of the repo
@@ -186,7 +183,7 @@ bundle_name = Dir.pwd.split('/').last.chomp
 bundle_name = ARGV[0] if( ARGV[0] )
 
 
-bundle_name = directory + prefix + bundle_name + suffix
+bundle_name = directory + prefix + bundle_name + FILENAME_SUFFIX
 
 
 puts "Backing up to bundle \"#{bundle_name}\""
