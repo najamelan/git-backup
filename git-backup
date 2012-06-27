@@ -76,13 +76,13 @@ directory.chomp!
 # check exit status of git config
 case $?.exitstatus
 
-	when 1 :	directory = Dir.pwd[ /(.+)\/[^\/]+/, 1]
+	when 1 then	directory = Dir.pwd[ /(.+)\/[^\/]+/, 1]
 
-				puts 'Warning: Could not find backup.directory in your git config file. Please set it. See "man git config" for more details on git configuration files. Defaulting to the same directroy your git repo is in: ' + directory
+					puts 'Warning: Could not find backup.directory in your git config file. Please set it. See "man git config" for more details on git configuration files. Defaulting to the same directroy your git repo is in: ' + directory
 
-	when 2 :	puts 'Warning: Multiple entries of backup.directory found in your git config file. Will use the last one: ' + directory
+	when 2 then	puts 'Warning: Multiple entries of backup.directory found in your git config file. Will use the last one: ' + directory
 
-	else     unless $?.exitstatus == 0 then raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus ) end
+	else     	unless $?.exitstatus == 0 then raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus ) end
 
 end
 
@@ -140,14 +140,14 @@ def git_config_bool( option, default_value )
 	case $?.exitstatus
 
 		# when not set take default
-		when 1 : return default_value
+		when 1 then return default_value
 
-		when 0 : return true unless config_value =~ /(false|no|0)/i
+		when 0 then return true unless config_value =~ /(false|no|0)/i
 
-		when 2 : puts 'Warning: Multiple entries of #{option.inspect} found in your git config file. Will use the last one: ' + config_value
-		 			return true unless config_value =~ /(false|no|0)/i
+		when 2 then puts 'Warning: Multiple entries of #{option.inspect} found in your git config file. Will use the last one: ' + config_value
+		 				return true unless config_value =~ /(false|no|0)/i
 
-		else     raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus )
+		else     	raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus )
 
 	end
 end
