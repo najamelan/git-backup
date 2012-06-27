@@ -3,37 +3,27 @@
 # For documentation please sea man git-backup(1)
 #
 # TODO:
+# - make it a class rather than a function
 # - check the standard format of git warnings to be conform
 # - do better checking for git repo than calling git status
 # - if multiple entries found in config file, specify which file
 # - make it work with submodules
-# - manpage
-# - automatic installer or inclusion in git
 # - propose to make backup directory if it does not exists
 # - depth feature in git config (eg. only keep 3 backups for a repo - like rotate...)
 # - TESTING
 
 
 
-
-# globals:
-
-git_dir_name = '.git' # just to avoid magic "strings"
+# allow calling from other scripts
+def git_backup
 
 
-
-# The original script refused to run unless it was called directly. I don't know why. Personally I would remove this
-if __FILE__ != $0
-
-	puts 'fatal: script not called directly. Currently not supported'
-	exit 1
-
-end
-
+# constants:
+git_dir_name    = '.git'          # just to avoid magic "strings"
+filename_suffix = ".git.bundle"   # will be added to the filename of the created backup
 
 
 # Test if we are inside a git repo
-
 `git status 2>&1`
 
 if $?.exitstatus != 0
@@ -80,12 +70,10 @@ directory = `git config --get backup.directory`
 
 
 # git config adds a newline, so remove it
-
 directory.chomp!
 
 
 # check exit status of git config
-
 case $?.exitstatus
 
 	when 1 :	directory = Dir.pwd[ /(.+)\/[^\/]+/, 1]
@@ -94,23 +82,15 @@ case $?.exitstatus
 
 	when 2 :	puts 'Warning: Multiple entries of backup.directory found in your git config file. Will use the last one: ' + directory
 
-	else     unless $?.exitstatus == 0 : raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus ) end
+	else     unless $?.exitstatus == 0 then raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus ) end
 
 end
 
 
 # verify directory exists
-#
 unless File::directory?( directory )
 
 	raise( 'fatal: backup directory does not exists: ' + directory )
-
-end
-
-
-unless directory =~ /\/$/
-
-	directory += '/'
 
 end
 
@@ -124,74 +104,54 @@ prefix_time      = Time.now.strftime( '%H:%M:%S' ) + ' - '
 add_date_default = true
 add_time_default = false
 
-
-# get the setting for the prefix-date from git config
-
-add_date = `git config --get backup.prefix-date`
-
-
-# check exit status of git config
-
-case $?.exitstatus
-
-	# when not set
-	when 1 : prefix += prefix_date if add_date_default
-
-	when 0 : prefix += prefix_date unless add_date =~ /(false|no|0)/i
-
-	when 2 : prefix += prefix_date unless add_date =~ /(false|no|0)/i
-				puts 'Warning: Multiple entries of backup.prefix-date found in your git config file. Will use the last one: ' + add_date
-
-	else     raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus )
-
-end
-
-
-
-
-# get the setting for the prefix-time from git config
-
-add_time = `git config --get backup.prefix-time`
-
-
-# check exit status of git config
-
-case $?.exitstatus
-
-	# when not set
-	when 1 : prefix += prefix_time if add_time_default
-
-	when 0 : prefix += prefix_time unless add_time =~ /(false|no|0)/i
-
-	when 2 : prefix += prefix_time unless add_time =~ /(false|no|0)/i
-				puts 'Warning: Multiple entries of backup.prefix-time found in your git config file. Will use the last one: ' + add_time
-
-	else     raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus )
-
-end
-
-
-
-# Suffix
-
-suffix = ".git.bundle"
+prefix += prefix_date if git_config_bool( 'backup.prefix-date', add_date_default )
+prefix += prefix_time if git_config_bool( 'backup.prefix-time', add_time_default )
 
 
 
 # default bundle name is the name of the repo
-# do we really need .chomp?
-bundle_name = Dir.pwd.split('/').last.chomp
+bundle_name = Dir.pwd.split('/').last
 
 # set the name of the file to the first command line argument if given
 bundle_name = ARGV[0] if( ARGV[0] )
 
 
-bundle_name = directory + prefix + bundle_name + suffix
+bundle_name = File::join( directory, prefix + bundle_name + filename_suffix )
 
 
-puts "Backing up to bundle \"#{bundle_name}\""
+puts "Backing up to bundle #{bundle_name.inspect}"
 
 
 # git bundle will print it's own error messages if it fails
-`git bundle create "#{bundle_name}" --all --remotes`
+`git bundle create #{bundle_name.inspect} --all --remotes`
+
+
+end # def git_backup
+
+
+
+# helper function to call git config to retrieve a boolean setting
+def git_config_bool( option, default_value )
+
+	# get the setting for the prefix-time from git config
+	config_value = `git config --get #{option.inspect}`
+
+	# check exit status of git config
+	case $?.exitstatus
+
+		# when not set take default
+		when 1 : return default_value
+
+		when 0 : return true unless config_value =~ /(false|no|0)/i
+
+		when 2 : puts 'Warning: Multiple entries of #{option.inspect} found in your git config file. Will use the last one: ' + config_value
+		 			return true unless config_value =~ /(false|no|0)/i
+
+		else     raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus )
+
+	end
+end
+
+# function needs to be called if we are not included in another script
+git_backup if __FILE__ == $0
 
