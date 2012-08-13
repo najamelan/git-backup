@@ -17,11 +17,29 @@
 # TODO:
 # -everything ;)
 #
+#
+
+bundle    = ARGV[ 0 ]
+directory = ARGV[ 1 ]
 
 
-`git clone --mirror "#{ARGV[0]}" "#{ARGV[1]}/.git"`
+if not File.exists?( bundle )
 
-Dir::chdir( "#{ARGV[1]}" )
+	raise( 'fatal: bundle not found: ' + bundle )
+
+end
+
+
+if File::directory?( directory )
+
+	raise( 'fatal: destination directory exists! Overwriting not supported for the moment.' )
+
+end
+
+
+`git clone --mirror "#{bundle}" "#{directory}/.git"`
+
+Dir::chdir( "#{directory}" )
 
 `git config core.bare false`
 `git config core.logallrefupdates true`
