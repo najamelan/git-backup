@@ -42,7 +42,7 @@ else # git status success
    end
 
 
-	unless File::directory?( Dir.pwd + '/.git' )
+   unless File::exists?( Dir.getwd + '/' + git_dir_name )
 
 		raise( 'fatal: Directory still not a git repo: ' + Dir.pwd )
 
