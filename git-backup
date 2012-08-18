@@ -44,7 +44,7 @@ else # git status success
 
    unless File::exists?( Dir.getwd + '/' + git_dir_name )
 
-		raise( 'fatal: Directory still not a git repo: ' + Dir.pwd )
+	  raise( 'fatal: Directory still not a git repo: ' + Dir.getwd )
 
    end
 
@@ -111,7 +111,7 @@ prefix += prefix_time if git_config_bool( 'backup.prefix-time', add_time_default
 
 
 # default bundle name is the name of the repo
-bundle_name = Dir.pwd.split('/').last
+bundle_name = Dir.getwd.split( '/' ).last
 
 # set the name of the file to the first command line argument if given
 bundle_name = ARGV[0] if( ARGV[0] )
