@@ -20,7 +20,7 @@ def git_backup
 
 # constants:
 git_dir_name    = '.git'          # just to avoid magic "strings"
-filename_suffix = ".git.bundle"   # will be added to the filename of the created backup
+filename_suffix = '.git-bundle'   # will be added to the filename of the created backup
 
 
 # Test if we are inside a git repo
@@ -28,27 +28,28 @@ filename_suffix = ".git.bundle"   # will be added to the filename of the created
 
 if $?.exitstatus != 0
 
-	puts 'fatal: Not a git repository: .git or at least cannot get zero exit status from "git status"'
-	exit 2
+   puts 'fatal: Not a git repository: .git or at least cannot get zero exit status from "git status"'
+   exit 2
 
 
 else # git status success
 
-	until    	 File::directory?( Dir.pwd + '/' + git_dir_name )             \
-				or  File::directory?( Dir.pwd                      ) == '/'
+   until     File::exists?( Dir.getwd + '/' + git_dir_name ) \
+			or  Dir.getwd == '/'
 
 
-			Dir.chdir( '..' )
-	end
+		 Dir.chdir( '..' )
+   end
 
 
 	unless File::directory?( Dir.pwd + '/.git' )
 
 		raise( 'fatal: Directory still not a git repo: ' + Dir.pwd )
 
-	end
+   end
 
 end
+
 
 
 # git-config --get of version 1.7.10 does:
@@ -90,7 +91,7 @@ end
 # verify directory exists
 unless File::directory?( directory )
 
-	raise( 'fatal: backup directory does not exists: ' + directory )
+   raise( 'fatal: backup directory does not exists: "' + directory + '"' )
 
 end
 
