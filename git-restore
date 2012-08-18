@@ -30,11 +30,23 @@ if not File.exists?( bundle )
 end
 
 
+# no dir given on cmd line
+#
+if directory === nil
+
+	directory = ( Dir.getwd + '/' + bundle ).gsub( /\.[^\/.]+$/ , '' )
+
+end
+
+
+# Destination already exists
+#
 if File::directory?( directory )
 
 	raise( 'fatal: destination directory exists! Overwriting not supported for the moment.' )
 
 end
+
 
 
 `git clone --mirror "#{bundle}" "#{directory}/.git"`
