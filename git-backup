@@ -10,9 +10,10 @@
 # - make it work with submodules
 # - propose to make backup directory if it does not exists
 # - depth feature in git config (eg. only keep 3 backups for a repo - like rotate...)
+# - take cmd line arguments as function parameters in order to be able to be called from other scripts. actually make git backup a class
 # - TESTING
 
-
+require "getoptlong"
 
 # allow calling from other scripts
 def git_backup
@@ -23,6 +24,10 @@ puts "\n"
 git_dir_name    = '.git'          # just to avoid magic "strings"
 filename_suffix = '.git-bundle'   # will be added to the filename of the created backup
 
+repo_dir        = nil
+call_dir        = Dir.getwd()
+
+arguments       = parse_command_line()
 
 # Test if we are inside a git repo
 `git status 2>&1`
@@ -51,6 +56,8 @@ else # git status success
 
 end
 
+# store the repo directory for later
+repo_dir = Dir.getwd
 
 
 # git-config --get of version 1.7.10 does:
@@ -68,23 +75,51 @@ end
 # get the setting for the backup directory
 # ----------------------------------------
 
-directory = `git config --get backup.directory`
+if arguments[ "directory" ] == nil
+
+	# git config adds a newline, so remove it
+	#
+	directory = `git config --get backup.directory`.chomp!
 
 
-# git config adds a newline, so remove it
-directory.chomp!
+	# check exit status of git config
+	case $?.exitstatus
+
+	   when 1 then directory = File.dirname( Dir.getwd )
+
+						puts "Warning: Could not find backup.directory in your git config file. Please set it.\n         See \"man git config\" for more details on git configuration files.\n         Defaulting to the same directroy your git repo is in: #{directory}\n\n"
+
+	   when 2 then puts 'Warning: Multiple entries of backup.directory found in your git config file. Will use the last one: ' + directory
+
+	   else        unless $?.exitstatus == 0 then raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus ) end
+
+	end
 
 
-# check exit status of git config
-case $?.exitstatus
+else
 
-	when 1 then	directory = Dir.pwd[ /(.+)\/[^\/]+/, 1]
+	# TODO: error handling and validation. Security
+	# absolute path
+	#
+	if( arguments[ "directory" ][ /^\// ] )
 
-					puts 'Warning: Could not find backup.directory in your git config file. Please set it. See "man git config" for more details on git configuration files. Defaulting to the same directroy your git repo is in: ' + directory
+		directory = arguments[ "directory" ]
 
-	when 2 then	puts 'Warning: Multiple entries of backup.directory found in your git config file. Will use the last one: ' + directory
 
-	else     	unless $?.exitstatus == 0 then raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus ) end
+	# relative path
+	#
+	else
+
+		directory = Dir.glob( call_dir + '/' + arguments[ "directory" ] )[ 0 ]
+
+
+		if directory === nil
+
+			raise( "No such directory: #{arguments[ "directory" ].inspect} in current working directory: #{call_dir.inspect}" )
+
+		end
+
+	end
 
 end
 
@@ -110,13 +145,14 @@ prefix += prefix_date if git_config_bool( 'backup.prefix-date', add_date_default
 prefix += prefix_time if git_config_bool( 'backup.prefix-time', add_time_default )
 
 
+# be sure to be in the right dir
+Dir::chdir( repo_dir )
 
 # default bundle name is the name of the repo
 bundle_name = Dir.getwd.split( '/' ).last
 
 # set the name of the file to the first command line argument if given
-bundle_name = ARGV[0] if( ARGV[0] )
-
+bundle_name = arguments[ "filename" ] if( arguments[ "filename" ] )
 
 bundle_name = File::join( directory, prefix + bundle_name + filename_suffix )
 
@@ -133,23 +169,93 @@ end # def git_backup
 # helper function to call git config to retrieve a boolean setting
 def git_config_bool( option, default_value )
 
-	# get the setting for the prefix-time from git config
-	config_value = `git config --get #{option.inspect}`
+   # get the setting for the prefix-time from git config
+   config_value = `git config --get #{option.inspect}`
 
-	# check exit status of git config
-	case $?.exitstatus
+   # check exit status of git config
+   case $?.exitstatus
 
-		# when not set take default
-		when 1 then return default_value
+	  # when not set take default
+	  when 1 then return default_value
 
-		when 0 then return true unless config_value =~ /(false|no|0)/i
+	  when 0 then return true unless config_value =~ /(false|no|0)/i
 
-		when 2 then puts 'Warning: Multiple entries of #{option.inspect} found in your git config file. Will use the last one: ' + config_value
-		 				return true unless config_value =~ /(false|no|0)/i
+	  when 2 then puts 'Warning: Multiple entries of #{option.inspect} found in your git config file. Will use the last one: ' + config_value
+				  return true unless config_value =~ /(false|no|0)/i
 
-		else     	raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus )
+	  else        raise( 'fatal: unknown exit status from git-config: ' + $?.exitstatus )
+
+   end
+end
+
+
+
+def parse_command_line()
+
+	parser = GetoptLong.new
+
+	parser.set_options(
+
+		[ "-h", "--help"     , GetoptLong::NO_ARGUMENT       ] ,
+		[ "-d", "--directory", GetoptLong::REQUIRED_ARGUMENT ] ,
+		[ "-f", "--filename" , GetoptLong::REQUIRED_ARGUMENT ]
+
+	)
+
+
+	directory = nil
+	filename  = nil
+
+
+	loop do
+
+		begin
+
+			opt, arg = parser.get
+
+			break if not opt
+
+			# Only for debugging purposes...
+			# puts( opt + " => " + arg )
+
+
+			case opt
+
+				when "-h"
+
+					puts "\nUsage: ..."
+					puts "       run from within a git repository to back it up to a bundle. Run 'man git backup' for more details.\n\n"
+					exit 0
+
+
+				when "-d"
+
+					directory = arg
+
+
+				when "-f"
+
+					filename = arg
+
+			end
+
+
+		rescue => err
+
+			puts err
+			break
+
+		end
 
 	end
+
+
+	return \
+	{
+		"filename"  => filename   ,
+		"directory" => directory
+	}
+
 end
 
 # function needs to be called if we are not included in another script
