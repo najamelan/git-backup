@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+
+cd testData
+
+rm -rf subRemote super submoduleBundle bundledSub *.git-bundle
+ls -Ralh

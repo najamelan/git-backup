@@ -1,0 +1,81 @@
+#!/bin/bash
+
+git --version
+
+cd testData
+
+mkdir super
+mkdir subRemote
+
+touch super/superFile.txt
+touch subRemote/subFile.txt
+
+cd super
+
+	git init
+	git add --all
+	git commit -am"Initial commit"
+
+cd ..
+
+
+cd subRemote
+
+	git init
+	git add --all
+	git commit -am"Initial commit"
+
+cd ..
+
+
+cd super
+
+	git submodule add ../subRemote/.git
+	git add --all
+	git commit -am"added submodule"
+	git submodule update
+
+
+	cd subRemote
+
+		echo -e "\ngit backup:"
+		../../../../git-backup -d ../..
+
+		echo -e "\ngit log in subRemote:"
+		git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative --all
+
+
+	cd ..
+
+cd ..
+
+
+../../git-restore *.git-bundle bundledSub
+
+
+
+
+#------------------------------------------------
+
+cd super
+
+	echo -e "\nfiles in super":
+	ls -alh
+
+cd ..
+
+
+cd super/subRemote
+
+	echo -e "\nfiles in super/subRemote":
+	ls -alh
+
+cd ../..
+
+
+cd bundledSub
+
+	echo -e "\nfiles in bundledSub":
+	ls -alh
+
+cd ..
