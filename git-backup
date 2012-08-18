@@ -17,6 +17,7 @@
 # allow calling from other scripts
 def git_backup
 
+puts "\n"
 
 # constants:
 git_dir_name    = '.git'          # just to avoid magic "strings"
@@ -119,14 +120,12 @@ bundle_name = ARGV[0] if( ARGV[0] )
 
 bundle_name = File::join( directory, prefix + bundle_name + filename_suffix )
 
-
-puts "Backing up to bundle #{bundle_name.inspect}"
-
+puts "Backing up to bundle: #{bundle_name.inspect}\n\n"
 
 # git bundle will print it's own error messages if it fails
 `git bundle create #{bundle_name.inspect} --all --remotes`
 
-
+puts "\n"
 end # def git_backup
 
 
