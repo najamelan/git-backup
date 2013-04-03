@@ -2,7 +2,7 @@ git-backup
 ==========
 
 
-Git-backup v0.1
+Git-backup v0.2b - August 18th 2012
 
 
 ## NAME
@@ -10,7 +10,7 @@ git-backup \- automates the process of creating a backup git bundle of a git rep
 
 
 ## SYNOPSIS
-git backup [BUNDLENAME]
+git backup [-d DESTINATION DIR] [-f BUNDLENAME]
 
 
 ## DESCRIPTION
@@ -18,7 +18,7 @@ Will run git bundle to create a backup of your git repository in the directory s
 
 
 ## INSTALLATION
-Copy this script to a directory in your path. Make sure it has executable permissions. Copy this man page to "/usr/local/man".
+Use 'sudo install.sh' to copy this script to a directory in your path. Make sure it has executable permissions. The man page will be copied to "/usr/local/man".
 
 
 ## CONFIGURATION
@@ -35,7 +35,14 @@ can be used to store a system-wide default configuration.
 
 
 ## OPTIONS
-Git-backup does not take any options. However, you can supply a bundlename if you don't want it to be the name of your repo.
+
+-d, --directory <dir name>
+
+	The destination directory if you want to override the git config value
+
+-f, --filename  <filename>
+
+	If you don't want to use the git repository name. Note that this still sets the date prefix and .git-bundle as extension. You can turn of the date prefix in the git config file. Probably in the future a raw filename option will be allowed so you can be sure of the created filename.
 
 
 ## SEE ALSO
@@ -45,9 +52,19 @@ https://github.com/najamelan/git-backup
 
 
 ## BUGS
-Should be fixed instead of listed here
+This is beta software. There is no automated testing and the feature set is limited.
 
-Please create bug reports in the issue tracker of github or better do a pull request.
+Please create bug reports and feature requests in the issue tracker of github or better do a pull request.
+
+For the moment this uses git-bundle. It seems very hard to gain an exact copy of a repository with git bundle. For example the following won't be copied:
+
+- .git/exclude
+- .git/config -> user section
+- ... potentially some more things
+
+So why not use tar or duplicity? We could and probably will at some point. One of the advantages of git bundle is it's improved compression. It repacks the object files and I think it gives a smaller file. Should be tested.
+
+On the other hand, backup utilities that do exactly this already exists (eg. backup-ninja).
 
 
 ## AUTHOR

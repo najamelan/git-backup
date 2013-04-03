@@ -1,7 +1,7 @@
 .\" Manpage for git-backup.
 
 
-.TH man 1 "06 May 2012" "Git-backup v0.1" "GIT-BACKUP"
+.TH man 1 "August 18th 2012" "git-backup v0.2b" "GIT-BACKUP"
 
 
 .SH NAME
@@ -9,7 +9,7 @@ git-backup \- automates the process of creating a backup git bundle of a git rep
 
 
 .SH SYNOPSIS
-git backup [BUNDLENAME]
+git backup [-d DESTINATION DIR] [-f BUNDLENAME]
 
 
 .SH DESCRIPTION
@@ -36,7 +36,14 @@ backup.prefix-time = boolean -- will propend the filename with a time in the for
 
 
 .SH OPTIONS
-Git-backup does not take any options. However, you can supply a bundlename if you don't want it to be the name of your repo.
+
+.B -d, --directory <dir name>
+
+	The destination directory if you want to override the git config value
+
+.B -f, --filename  <filename>
+
+	If you don't want to use the git repository name. Note that this still sets the date prefix and .git-bundle as extension. You can turn of the date prefix in the git config file. Probably in the future a raw filename option will be allowed so you can be sure off the created filename.
 
 
 .SH SEE ALSO
@@ -46,9 +53,19 @@ https://github.com/najamelan/git-backup
 
 
 .SH BUGS
-Currently git bundle does not work correctly with submodules. It is currently impossible to back up a submodule with git backup
+This is beta software. There is no automated testing and the feature set is limited.
 
-Please create bug reports in the issue tracker of github or better do a pull request.
+Please create bug reports and feature requests in the issue tracker of github or better do a pull request.
+
+For the moment this uses git-bundle. It seems very hard to gain an exact copy of a repository with git bundle. For example the following won't be copied:
+
+- .git/exclude
+- .git/config -> user section
+- ... potentially some more things
+
+So why not use tar or duplicity? We could and probably will at some point. One of the advantages of git bundle is it's improved compression. It repacks the object files and I think it gives a smaller file. Should be tested.
+
+On the other hand, backup utilities that do exactly this already exists (eg. backup-ninja).
 
 
 .SH AUTHOR
